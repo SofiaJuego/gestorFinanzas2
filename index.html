@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestor de Finanzas Personales</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-indigo-50 min-h-screen text-slate-700 p-4 md:p-8 font-sans">
+    <div class="max-w-4xl mx-auto space-y-6">
+      <!-- Título -->
+      -
+      <header class="text-center space-y-1">
+        <h1 class="text-3xl font-bold text-slate-800">
+          Gestor de Finanzas Personales
+        </h1>
+        <p class="text-sm text-slate-500">
+          Lleva el control de tus ingresos y gastos de forma súper fácil
+        </p>
+      </header>
+
+      <!-- Balance global  -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Ingresos -->
+        <div
+          class="bg-white p-6 rounded-2xl shadow-md border-b-4 border-emerald-400 flex items-center justify-between"
+        >
+          <div>
+            <h3
+              class="text-xs font-bold uppercase tracking-wider text-slate-400"
+            >
+              Ingresos Totales
+            </h3>
+            <p
+              id="total-ingresos"
+              class="text-2xl font-black text-emerald-600 mt-1"
+            >
+              $0.00
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 text-xl font-bold"
+          >
+            +
+          </div>
+        </div>
+
+        <!-- Gastos -->
+        <div
+          class="bg-white p-6 rounded-2xl shadow-md border-b-4 border-rose-400 flex items-center justify-between"
+        >
+          <div>
+            <h3
+              class="text-xs font-bold uppercase tracking-wider text-slate-400"
+            >
+              Gastos Totales
+            </h3>
+            <p id="total-gastos" class="text-2xl font-black text-rose-500 mt-1">
+              $0.00
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 text-xl font-bold"
+          >
+            -
+          </div>
+        </div>
+
+        <!-- Balance Neto -->
+        <div
+          class="bg-white p-6 rounded-2xl shadow-md border-b-4 border-indigo-500 flex items-center justify-between"
+        >
+          <div>
+            <h3
+              class="text-xs font-bold uppercase tracking-wider text-slate-400"
+            >
+              Balance Neto
+            </h3>
+            <p
+              id="balance-neto"
+              class="text-2xl font-black text-slate-800 mt-1"
+            >
+              $0.00
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 text-xl font-bold"
+          >
+            =
+          </div>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Formulario -->
+        <section
+          class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 md:col-span-1"
+        >
+          <h2
+            class="text-base font-bold mb-4 text-slate-800 flex items-center gap-2"
+          >
+            <span></span> Nuevo Movimiento
+          </h2>
+
+          <form id="form-transaccion" class="space-y-4">
+            <!-- Descripción -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1"
+                >Descripción</label
+              >
+              <input
+                type="text"
+                id="descripcion"
+                required
+                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition"
+                placeholder="Ej. Salida con amigos"
+              />
+            </div>
+
+            <!-- Monto -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1"
+                >Monto ($)</label
+              >
+              <input
+                type="number"
+                id="monto"
+                step="0.01"
+                required
+                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition"
+                placeholder="0.00"
+              />
+            </div>
+
+            <!-- Tipo -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1"
+                >Tipo</label
+              >
+              <select
+                id="tipo"
+                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition"
+              >
+                <option value="ingreso">Ingreso</option>
+                <option value="gasto">Gasto</option>
+              </select>
+            </div>
+
+            <!-- Categoría -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1"
+                >Categoría</label
+              >
+              <select
+                id="categoria"
+                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition"
+              >
+                <option value="Sueldo">Sueldo</option>
+                <option value="Comida">Comida</option>
+                <option value="Transporte">Transporte</option>
+                <option value="Entretenimiento">Entretenimiento</option>
+                <option value="Otros">Otros</option>
+              </select>
+            </div>
+
+            <!-- Botón -->
+            <button
+              type="submit"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm shadow-md shadow-indigo-200 transition transform active:scale-95"
+            >
+              Agregar Movimiento
+            </button>
+          </form>
+        </section>
+
+        <!-- Historial de movimientos -->
+        <section
+          class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 md:col-span-2"
+        >
+          <h2
+            class="text-base font-bold mb-4 text-slate-800 flex items-center gap-2"
+          >
+            <span></span> Historial de Transacciones
+          </h2>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr
+                  class="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase"
+                >
+                  <th class="py-3 px-3">Descripción</th>
+                  <th class="py-3 px-3">Categoría</th>
+                  <th class="py-3 px-3">Monto</th>
+                  <th class="py-3 px-3 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody
+                id="tabla-movimientos"
+                class="text-sm divide-y divide-slate-50"
+              >
+                <!-- Filas se insertarán -->
+                <tr class="text-slate-400 text-center">
+                  <td colspan="4" class="py-8">
+                    Todavía no hay movimientos registrados. ¡Agrega uno!
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
