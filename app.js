@@ -7,7 +7,11 @@ const totalGastosElem = document.getElementById('total-gastos');
 const balanceNetoElem = document.getElementById('balance-neto');
 const selectTipo = document.getElementById('tipo');
 const selectCategoria = document.getElementById('categoria');
-const errorMessageElem = document.getElementById('error'); // <- ¡Agregado! Asegúrate de tener un elemento con id="error" en tu HTML si lo usas
+const errorMessageElem = document.getElementById('error');
+const fechaInput = document.getElementById('fecha'); // <- ¡Agregado! Asegúrate de tener un elemento con id="fecha" en tu HTML si lo usas
+
+//fecha actual por defecto en el input de fech a
+fechaInput.value = new Date().toISOString().split('T')[0]; // Establece la fecha actual como valor predeterminado
 
 // Validamos por tipo de categoría 
 const categoriasPorTipo = {
@@ -46,8 +50,9 @@ function cargarDesdeLocalStorage() {
         Transaccion.historial = [];
 
         transacciones.map(t => {
-            const nuevaT = new Transaccion(t.tipo, t.descripcion, t.monto, t.categoria);
+            const nuevaT = new Transaccion(t.tipo, t.descripcion, t.monto, t.categoria, t.fecha);
             nuevaT.id = t.id; // Mantenemos el ID original
+            if(t.fecha) {nuevaT.fecha = t.fecha;} // por si no viene con fecha, le guardo la que tenía
             return nuevaT;
         });
     }
@@ -62,13 +67,14 @@ form.addEventListener('submit', (e) => {
     const montoStr = document.getElementById('monto').value;
     const tipo = selectTipo.value;
     const categoria = selectCategoria.value;
+    const fecha = fechaInput.value; 
 
     try{
-        const nuevaTransaccion = new Transaccion(tipo, descripcion, montoStr, categoria);
+        const nuevaTransaccion = new Transaccion(tipo, descripcion, montoStr, categoria, fecha);
         guardarEnLocalStorage();
         actualizarInterfaz();
         form.reset();
-        actualizarCategorias();
+        fechaInput.value = new Date().toISOString().split('T')[0]; 
 
         if(errorMessageElem) {
             errorMessageElem.textContent = '';
@@ -121,6 +127,7 @@ function actualizarInterfaz() {
         const signoMonto = t.tipo === 'ingreso' ? '+' : '-';
 
         tr.innerHTML = `
+         <td class="py-3 px-3 font-medium text-slate-800">${t.fecha}</td>
             <td class="py-3 px-3 font-medium text-slate-800">${t.descripcion}</td>
             <td class="py-3 px-3 text-slate-600">
                 <span class="px-2 py-1 bg-slate-100 rounded-md text-xs">${t.categoria}</span>
@@ -157,7 +164,7 @@ window.eliminarTransaccion = function(id) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    actualizarCategorias();        // Carga inicial de categorías
-    cargarDesdeLocalStorage();     // Carga los datos guardados en localStorage
-    actualizarInterfaz();          // Pinta la tabla y calcula los balances
+    actualizarCategorias();       
+    cargarDesdeLocalStorage();   
+    actualizarInterfaz();         
 });
