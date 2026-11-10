@@ -8,10 +8,10 @@ const balanceNetoElem = document.getElementById('balance-neto');
 const selectTipo = document.getElementById('tipo');
 const selectCategoria = document.getElementById('categoria');
 const errorMessageElem = document.getElementById('error');
-const fechaInput = document.getElementById('fecha'); // <- ¡Agregado! Asegúrate de tener un elemento con id="fecha" en tu HTML si lo usas
+const fechaInput = document.getElementById('fecha'); 
 
 //fecha actual por defecto en el input de fech a
-fechaInput.value = new Date().toISOString().split('T')[0]; // Establece la fecha actual como valor predeterminado
+fechaInput.value = new Date().toISOString().split('T')[0]; 
 
 // Validamos por tipo de categoría 
 const categoriasPorTipo = {
@@ -56,6 +56,51 @@ function cargarDesdeLocalStorage() {
             return nuevaT;
         });
     }
+}
+
+//GRAFICO POR CATEGORIAS
+let chartInstance = null;
+
+function actualizarGraficoCategorias() {
+    const ctx = document.getElementById('grafico-categorias').getContext('2d');
+
+    const categoriasGastos = categoriasPorTipo.gasto;
+    const totalesPorCategoria = categoriasGastos.map(cat => {
+        return Transaccion.historial
+            .filter(t => t.tipo === 'gasto' && t.categoria === cat)
+            .reduce((sum, t) => sum + t.monto, 0);
+    });
+
+    if(chartInstance) {
+        chartInstance.destroy(); // destruye el grafico viejo antes de crear uno nuevo
+    }
+
+    chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: categoriasGastos,
+            datasets: [{
+                label: 'Gastos por Categoría',
+                data: totalesPorCategoria,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                
+            }
+        }
+    }
+    });
+
+
 }
 
 // Submit del formulario
@@ -150,6 +195,7 @@ function actualizarInterfaz() {
     balanceNetoElem.textContent = `$${balanceNeto.toFixed(2)}`;
     
     balanceNetoElem.className = `text-2xl font-bold ${balanceNeto >= 0 ? 'text-slate-900' : 'text-rose-600'}`;
+    actualizarGraficoCategorias(); // actualizamos 
 }
 
 // Eliminamos registro de la transacción
