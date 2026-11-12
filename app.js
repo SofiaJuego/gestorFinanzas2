@@ -33,7 +33,7 @@ function actualizarCategorias() {
     });
 }
 
-// Cuando cambia el tipo (Ingreso/Gasto) para actualizar las categorías
+// Cuando cambia el tipo (ingreso/gasto) para actualizar las categorías
 selectTipo.addEventListener('change', actualizarCategorias);
 
 // LOCALSTORAGE
@@ -46,7 +46,7 @@ function cargarDesdeLocalStorage() {
     if(datosGuardados){
         const transacciones = JSON.parse(datosGuardados);
 
-        // Limpiamos el historial actual antes de mapear para evitar que se dupliquen al recargar
+        // limpiamos el historial actual para evitar que se dupliquen
         Transaccion.historial = [];
 
         transacciones.map(t => {
@@ -103,6 +103,87 @@ function actualizarGraficoCategorias() {
 
 }
 
+// GRAFICO DE LINEA - EVOLUCION TEMPORAL
+let chartEvolucionInstance = null;
+function actualizarGraficoEvolucion() {
+    const ctx = document.getElementById('grafico-temporal').getContext('2d');
+    //se ordena el historial por fechsa 
+    const transaccionesOrdenadas = [...Transaccion.historial].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+    
+    const fechasUnicas = [...new Set(transaccionesOrdenadas.map(t => t.fecha))];
+
+    let acumuladoIngresos = 0;
+    let acumuladoGastos = 0;
+
+    const datosIngresos = [];
+    const datosGastos = [];
+    const datosBalance = [];
+
+
+    fechasUnicas.forEach(fecha => {
+        // filtro las transacciones del día actual
+        const transaccionesDelDia = transaccionesOrdenadas.filter(t => t.fecha === fecha);
+
+        transaccionesDelDia.forEach(t => {
+            if(t.tipo === 'ingreso') {
+                acumuladoIngresos += t.monto;
+            } else {
+                acumuladoGastos += t.monto;
+            }
+        });
+        // guardo los acumulados 
+        datosIngresos.push(acumuladoIngresos);
+        datosGastos.push(acumuladoGastos);
+        datosBalance.push(acumuladoIngresos - acumuladoGastos);
+    });
+    if(chartEvolucionInstance) {
+        chartEvolucionInstance.destroy(); // destruye el grafico viejo 
+    }
+
+    chartEvolucionInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: fechasUnicas,
+            datasets: [
+                {
+                    label: 'Ingresos acumulados',
+                    data: datosIngresos,
+                    borderColor: 'rgba(16, 185, 129)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    fill: true
+                },
+                {
+                    label: 'Gastos acumulados',
+                    data: datosGastos,
+                    borderColor: 'rgba(244, 63, 94)',
+                    backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                    borderWidth: 2,
+                    fill: true
+                },
+                {
+                    label: 'Balance acumulado',
+                    data: datosBalance,
+                    borderColor: 'rgba(99, 102, 241)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 2,
+                    fill: true
+                },
+                
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
 // Submit del formulario
 form.addEventListener('submit', (e) => {
     e.preventDefault(); // Es para que la página no se recargue
@@ -123,7 +204,7 @@ form.addEventListener('submit', (e) => {
 
         if(errorMessageElem) {
             errorMessageElem.textContent = '';
-            errorMessageElem.classList.add('hidden'); // Ocultamos el error si todo salió bien
+            errorMessageElem.classList.add('hidden'); // Ocultamos el error si todo salio bien
         } 
 
     } catch(error) {
@@ -196,6 +277,7 @@ function actualizarInterfaz() {
     
     balanceNetoElem.className = `text-2xl font-bold ${balanceNeto >= 0 ? 'text-slate-900' : 'text-rose-600'}`;
     actualizarGraficoCategorias(); // actualizamos 
+    actualizarGraficoEvolucion(); // actualizamos el grafico de evolucion temporal
 }
 
 // Eliminamos registro de la transacción
