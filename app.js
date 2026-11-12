@@ -225,7 +225,7 @@ function actualizarInterfaz() {
     if (Transaccion.historial.length === 0) {
         tablaMovimientos.innerHTML = `
             <tr class="text-slate-400 text-center">
-                <td colspan="4" class="py-4">No hay movimientos registrados todavía.</td>
+                <td colspan="5" class="py-4">No hay movimientos registrados todavía.</td>
             </tr>
         `;
         totalIngresosElem.textContent = '$0.00';
